@@ -288,8 +288,8 @@ class TestSender(Base):
             except:
                 etype, exc, tb = sys.exc_info()
 
-        eq_(type(exc), TokenExpired)
-        eq_(exc.localtime_in_seconds, now)
+        assert type(exc) == TokenExpired
+        assert exc.localtime_in_seconds == now
 
     def test_localtime_offset(self):
         now = utc_now() - 120
@@ -371,7 +371,7 @@ class TestSender(Base):
         sn = self.Sender(ext="foo=bar&foo2=bar2;foo3=bar3")
         self.receive(sn.request_header)
         parsed = parse_authorization_header(sn.request_header)
-        eq_(parsed['ext'], "foo=bar&foo2=bar2;foo3=bar3")
+        assert parsed['ext'] == "foo=bar&foo2=bar2;foo3=bar3"
 
     @raises(HawkFail)
     def test_non_hawk_scheme(self):
@@ -385,7 +385,7 @@ class TestSender(Base):
         valid_characters = "!#$%&'()*+,-./:;<=>?@[]^_`{|}~ azAZ09_"
         sender = self.Sender(ext=valid_characters)
         parsed = parse_authorization_header(sender.request_header)
-        eq_(parsed['ext'], valid_characters)
+        assert parsed['ext'] == valid_characters
 
     @raises(BadHeaderValue)
     def test_ext_with_illegal_chars(self):
@@ -421,7 +421,7 @@ class TestSender(Base):
         sn = self.Sender(app=app)
         self.receive(sn.request_header)
         parsed = parse_authorization_header(sn.request_header)
-        eq_(parsed['app'], app)
+        assert parsed['app'] == app
 
     @raises(MacMismatch)
     def test_tampered_app(self):
@@ -435,7 +435,7 @@ class TestSender(Base):
         sn = self.Sender(dlg=dlg)
         self.receive(sn.request_header)
         parsed = parse_authorization_header(sn.request_header)
-        eq_(parsed['dlg'], dlg)
+        assert parsed['dlg'] == dlg
 
     @raises(MacMismatch)
     def test_tampered_dlg(self):
@@ -589,7 +589,7 @@ class TestReceiver(Base):
                 calculated = calculate_ts_mac(fn(), self.credentials)
                 if isinstance(calculated, six.binary_type):
                     calculated = calculated.decode('ascii')
-                eq_(hdr['tsm'], calculated)
+                assert hdr['tsm'] == calculated
                 raise
 
     def test_respond_with_bad_ts_skew_ok(self):
@@ -611,7 +611,7 @@ class TestReceiver(Base):
         ext = 'custom-ext'
         self.respond(ext=ext)
         header = parse_authorization_header(self.receiver.response_header)
-        eq_(header['ext'], ext)
+        assert header['ext'] == ext
 
     @raises(MacMismatch)
     def test_respond_with_wrong_app(self):
@@ -854,7 +854,7 @@ class TestBewit(Base):
         bewit = get_bewit(res)
 
         expected = '123456\\1356420707\\IGYmLgIqLrCe8CxvKPs4JlWIA+UjWJJouwgARiVhCAg=\\'
-        eq_(b64decode(bewit).decode('ascii'), expected)
+        assert b64decode(bewit).decode('ascii') == expected
 
     def test_bewit_with_binary_id(self):
         # Check for exceptions in get_bewit call with binary id
@@ -877,7 +877,7 @@ class TestBewit(Base):
         bewit = get_bewit(res)
 
         expected = '123456\\1356420707\\kscxwNR2tJpP1T1zDLNPbB5UiKIU9tOSJXTUdG7X9h8=\\xandyandz'
-        eq_(b64decode(bewit).decode('ascii'), expected)
+        assert b64decode(bewit).decode('ascii') == expected
 
     @raises(BadHeaderValue)
     def test_bewit_with_invalid_ext(self):
@@ -905,7 +905,7 @@ class TestBewit(Base):
         bewit = get_bewit(res)
 
         expected = '123456\\1356420707\\hZbJ3P2cKEo4ky0C8jkZAkRyCZueg4WSNbxV7vq3xHU=\\xandyandz'
-        eq_(b64decode(bewit).decode('ascii'), expected)
+        assert b64decode(bewit).decode('ascii') == expected
 
     @raises(ValueError)
     def test_bewit_with_nonce(self):
